@@ -1,39 +1,69 @@
-#+INCLUDE: ./doc_modern.org
+#+STARTUP: showall indent latexpreview entitiespretty
+#+OPTIONS: toc:nil
 
-* Torte salate
-** Torta salata alla zucca e cime di rapa
-***   Ingredienti
+#+BEGIN_EXPORT latex
+\newpage
+#+END_EXPORT
 
-| Qt.           | Ingrediente                                        |
-|---------------+----------------------------------------------------|
-|               | pasta brise                                        |
-| 250 gr. circa | polpa di zucca tagliati a pezzi di media grandezza |
-| 400 gr. circa | cime di rapa                                       |
-| 2             | uova                                               |
-| 150 gr.       | formaggio caprino fresco/ricotta di capra o        |
-| 2             | cucchiai di Grana Padano grattugiato               |
-| 1 dl.         | di panna fresca                                    |
-|               | noce moscata                                       |
-|               | sale e pepe                                        |
+* Pane
 
-***   Preparazione
+Tratto da http://www.my-personaltrainer.it/Tv/Ricette/Pane_Pizza_Brioche/baguette-fatte-in-casa.html#2
 
-Lessa la zucca al vapore senza esagerare nella cottura, la polpa non
-deve disfarsi, quindi versa i pezzi di zucca cotti in un colino in modo
-che perdano l'eventuale acqua in eccesso. Pulisci le cime di rapa e
-togli i gambi più legnosi e cuocile al vapore per circa 8-10 minuti,
-quindi passale velocemente sotto l'acqua corrente fredda per mantenere
-il bel colore verde. In una ciotola lavora il formaggio con le uova ed
-il Grana Padano grattugiato, aggiungi la panna, insaporisci con un po'
-di noce moscata e aggiusta di sale e pepe e con una piccola frusta
-amalgama bene fino ad ottenere una crema abbastanza liquida.
 
-Sistema le le cime di rapa nella tortiera, direttamente sopra la pasta
-brisée e alternale con i pezzi di zucca. Infine versa la crema in
-maniera uniforme sopra le verdure e inforna a 200° per circa 30-40
-minuti.
+#+BEGIN_SRC shell :results silent :exports none :noweb yes
+cat <<EOF | mmdc -i /dev/stdin -o ./gantt-uc.pdf | pdfcrop ./gantt-uc.pdf ./gantt.pdf
+gantt
+title Preparazione pane
+dateFormat  HH-mm
 
-Se preferisci una versione più saporita cuoci la zucca in forno con gli
-aromi che preferisci con un giro d'olio d'oliva e passa velocemente le
-cime di rapa in padella con un po' di burro. Io ho preferito usare le
-verdure cotte al vapore per rendere la torta salata più leggera. 
+section Biga
+S1 = filter(farina) : s1,     21-00, 3m
+S2 = mix(lievito 2g, acqua TPD, zucchero) : s2,     after s1, 3m
+mix(S1, S2) ~ 5m: s3,     after s2, 3m
+rest(S?,TA) (pellicola) ~ 90m   : s4,     after s3, 90m
+rest(rework(S?), TFZ) (pellicola) ~ 8h : s5,     after s4, 10h
+rest(S?,TA) ~ 10m   : s6,     after s5, 10m
+
+section Impasto
+I? = mix(lievito 2g, acqua 50ml, 1 zucchero) : i1, after s5, 20m
+I? = mix(filter(farina), liev 3g, I?, acqua 250ml) ~ 5m: i22, after i1, 5m
+I? = rest(I?, TA) ~ 20m: i23, after i22, 5m
+I? = mix(I?, S?) : i24, after i23, 5m
+I? = mix(I?, sale (15g)) ~ 5m: i2, after i24, 5m
+rest(I?,TPD) ~30m        : i3, after i2, 30m
+rework(I?)  ~2m       : i4, after i3, 3m
+rest(I?, TPD) ~ 90m: i5, after i4, 90m
+Allargare, allungare e arrotolare nello stampo : i6, after i5, 1m
+rest(I?, TA) ~ 15m : i7, after i6, 15m
+rest(I?, TFZ) ~ 8h : i8, after i7, 10h
+
+section Cottura
+rest(I?, TA) ~ 30m : i9, after i8, 30m
+Preriscaldare forno a 250 con pentolino acqua sul fondo: i10, after i8, 10m
+Incidere, spruzzare acqua e cuocere a 250 (5m): i11, after i9, 5m
+Spruzzare acqua e abbassare a 220 gradi (30m): i11, after i9, 30m
+Spegnere il forno e lasciare lo stampo per (10m): i12, after i11, 10m
+EOF
+
+#+END_SRC
+
+file:./gantt.pdf
+
+| Ingrediente |        mod. | Qt. tre baguette |  Qt. eff. | Unita' |
+|-------------+-------------+------------------+-----------+--------|
+| *n. baguette* |             |                  |         2 |        |
+| *biga*        |             |                  |           |        |
+| zucchero    |             |                5 | 3.3333333 | g      |
+| acqua       |             |              140 | 93.333333 | ml     |
+| lievito     | birra secco |                2 | 1.3333333 | g      |
+| farina      |           0 |              110 | 73.333333 | g      |
+| farina      |          00 |              110 | 73.333333 | g      |
+|             |             |                  |         0 |        |
+| *impasto*     |             |                  |         0 |        |
+| acqua       |             |              300 |       200 | ml     |
+| lievito     | birra secco |                3 |         2 | g      |
+| zucchero    |             |                5 | 3.3333333 | g      |
+| sale        |             |               15 |        10 | g      |
+| farina      |           0 |              225 |       150 | g      |
+| farina      |          00 |              225 |       150 | g      |
+#+TBLFM: @4$4..@16$4=($3/3)*@2$4
